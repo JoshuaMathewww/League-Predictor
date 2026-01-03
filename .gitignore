@@ -1,3 +1,21 @@
+# Backend
+backend/app/config.py
+backend/venv/
+backend/env/
+.venv/
+env/
+venv/
+backend/__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+.eslintcache
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
