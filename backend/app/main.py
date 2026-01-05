@@ -119,8 +119,6 @@ async def get_player_stats(p_puuid, routing, platform, count, queue):
 
                 enemyChampId = -1
                 current_pos = stats.get("teamPosition")
-                
-                # Special modes (ARAM/Mayhem) often have no teamPosition
                 if current_pos and current_pos != "" and current_pos != "NONE":
                     enemyLaner = next((p for p in m_data["info"]["participants"] if p["teamPosition"] == current_pos and p["teamId"] != team_id), None)
                     if enemyLaner:
@@ -150,6 +148,7 @@ async def get_player_stats(p_puuid, routing, platform, count, queue):
                     "subStyle": stats["perks"]["styles"][1]["style"],
                     "keystoneId": stats["perks"]["styles"][0]["selections"][0]["perk"],
                     "challenges": stats.get("challenges", {}),
+                    "timePlayed": stats["timePlayed"],
                     "game_duration": m_data["info"]["gameDuration"], 
                     "game_end_timestamp": m_data["info"]["gameEndTimestamp"]
                 })    
@@ -165,7 +164,7 @@ async def live_game_history(name: str, tag: str, routing: str = "americas", plat
     account = await riot.get_account_by_riot_id(name=name, tag=tag, routing=routing)
     game = await riot.get_active_game_by_puuid(puuid=account["puuid"], platform=platform)
     
-    if game is None:
+    if game is None:    
         return {"in_game": False}
 
     lane_probs = load_lanes_data()

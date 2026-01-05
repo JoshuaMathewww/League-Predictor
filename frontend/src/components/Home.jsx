@@ -56,7 +56,7 @@ function Home({ onSearch, error, setError }) {
         <button type="submit" className="bg-blue-600 px-6 font-bold rounded-e-lg hover:bg-blue-500">Search</button>
       </form>
       {error && (
-        <p className="text-red-500 text-sm mt-4 font-bold animate-pulse text-center">
+        <p className="text-red-500 text-sm mt-4 font-bold text-center">
             {error}
         </p>
       )}

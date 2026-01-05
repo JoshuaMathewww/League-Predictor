@@ -55,13 +55,11 @@ const sortParticipantsByLane = (participants) => {
   const sorted = { TOP: null, JNG: null, MID: null, BOT: null, SUP: null };
   const remaining = [...participants];
   
-  // Lock Jungle by Smite (ID 11)
   const jngIndex = remaining.findIndex(p => p.spell1Id === 11 || p.spell2Id === 11);
   if (jngIndex !== -1) {
     sorted.JNG = remaining.splice(jngIndex, 1)[0];
   }
 
-  // Assign remaining roles based on highest percentage
   const order = ['TOP', 'MID', 'BOT', 'SUP'];
   order.forEach(lane => {
     if (remaining.length === 0) return;
@@ -218,9 +216,9 @@ function LiveGame({ data }) {
   };
   
   return (
-    <div className="min-h-screen text-white p-6 flex flex-col items-center">
-      <div className="w-full max-w-7xl">
-        <header className="mb-6 border-b border-slate-800 pb-6 flex justify-between items-end">
+    <div className="min-h-screen text-white pt-2 pb-6 px-6 flex flex-col items-center">
+      <div className="w-full max-w-[1800px]">
+        <header className="mb-6 border-b border-slate-800/50 pb-6 flex justify-between items-end w-full px-2">
           <div>
             <p className="text-blue-500 font-bold tracking-widest text-xs uppercase mb-1">Live Match Found</p>
             <h2 className="text-4xl font-black uppercase tracking-tighter">
@@ -235,14 +233,14 @@ function LiveGame({ data }) {
           </div>
         </header>
 
-        <div className="flex justify-between items-center mb-8 px-6 py-3 bg-slate-900/40 rounded-xl border border-slate-800/40 shadow-inner">
+        <div className="flex justify-between items-center mb-8 px-6 py-3 bg-slate-900/40 rounded-xl border border-slate-800/40 shadow-inner w-full">
           <div className="flex gap-2 items-center">
             <span className="text-[10px] font-bold uppercase tracking-widest text-blue-500/60 mr-2">Blue Bans</span>
             {[0, 1, 2, 3, 4].map(i => (
               <BannedChampIcon key={`blue-ban-${i}`} championId={data.banned_champions?.filter(b => b.teamId === 100)[i]?.championId} />
             ))}
           </div>
-          <div className="h-10 w-[1px] bg-slate-800/80 mx-2"></div>
+          <div className="h-10 w-[1px] bg-slate-800/80 mx-4 hidden lg:block"></div>
           <div className="flex flex-row-reverse gap-2 items-center">
             <span className="text-[10px] font-bold uppercase tracking-widest text-red-500/60 ml-2">Red Bans</span>
             {[0, 1, 2, 3, 4].map(i => (
@@ -251,7 +249,7 @@ function LiveGame({ data }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-1 gap-y-4">
           {/* Blue Team Participants */}
           <div className="space-y-2">
             <h3 className="text-blue-400 font-bold border-l-4 border-blue-500 pl-3 mb-4 uppercase text-sm tracking-wider">Blue Team</h3>
@@ -271,12 +269,12 @@ function LiveGame({ data }) {
                   <div className="absolute top-0 left-0 bg-blue-600/20 text-blue-400 text-[8px] font-medium px-2 py-0.5 rounded-br border-r border-b border-blue-500/30 tracking-widest">
                     {['TOP', 'JNG', 'MID', 'BOT', 'SUP'][index]}
                   </div>
-                  <div className="flex items-center gap-4 ml-2">
-                    <img src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${p.championId}.png`} alt="champion" className="w-16 h-16 rounded border border-slate-700 shadow-lg" />
-                    <div>
+                  <div className="flex items-center gap-4 ml-2 flex-1 min-w-0">
+                    <img src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${p.championId}.png`} alt="champion" className="w-16 h-16 rounded border border-slate-700 shadow-lg flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-lg font-bold leading-none">{p.summonerName}{p.bot && <span className="ml-2 text-red-500 text-sm font-black">(BOT)</span>}</p>
-                        <div className="flex items-center gap-1.5 ml-1">
+                        <p className="text-lg font-bold leading-none truncate">{p.summonerName}{p.bot && <span className="ml-2 text-red-500 text-sm font-black">(BOT)</span>}</p>
+                        <div className="flex items-center gap-1.5 ml-1 flex-shrink-0">
                           <img src={getRankIcon(p.rank?.tier)} className="w-5 h-5 object-contain" alt="rank-icon" />
                           <span className="text-indigo-300/90 text-[12px] font-bold uppercase tracking-tight">{p.rank?.tier} {p.rank?.rank} - {p.rank?.lp} LP</span>
                         </div>
@@ -289,7 +287,7 @@ function LiveGame({ data }) {
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-center pl-12 flex-shrink-0">
                     <div className="flex flex-col gap-1">
                       <img src={`https://ddragon.leagueoflegends.com/cdn/15.23.1/img/spell/${getSpellName(p.spell1Id)}.png`} className="w-7 h-7 rounded border border-slate-800" title="Spell 1" />
                       <img src={`https://ddragon.leagueoflegends.com/cdn/15.23.1/img/spell/${getSpellName(p.spell2Id)}.png`} className="w-7 h-7 rounded border border-slate-800" title="Spell 2" />
@@ -320,12 +318,12 @@ function LiveGame({ data }) {
                   <div className="absolute top-0 right-0 bg-red-600/20 text-red-400 text-[8px] font-medium px-2 py-0.5 rounded-bl border-l border-b border-red-500/30 tracking-widest">
                     {['TOP', 'JNG', 'MID', 'BOT', 'SUP'][index]}
                   </div>
-                  <div className="flex flex-row-reverse items-center gap-4 text-right mr-2">
-                    <img src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${p.championId}.png`} alt="champion" className="w-16 h-16 rounded border border-slate-700 shadow-lg" />
-                    <div>
+                  <div className="flex flex-row-reverse items-center gap-4 text-right mr-2 flex-1 min-w-0">
+                    <img src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${p.championId}.png`} alt="champion" className="w-16 h-16 rounded border border-slate-700 shadow-lg flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
                       <div className="flex flex-row-reverse items-center gap-2">
-                        <p className="text-lg font-bold leading-none">{p.bot && <span className="mr-2 text-red-500 text-sm font-black">(BOT)</span>}{p.summonerName}</p>
-                        <div className="flex flex-row-reverse items-center gap-1.5 mr-1">
+                        <p className="text-lg font-bold leading-none truncate">{p.summonerName}{p.bot && <span className="mr-2 text-red-500 text-sm font-black">(BOT)</span>}</p>
+                        <div className="flex flex-row-reverse items-center gap-1.5 mr-1 flex-shrink-0">
                           <img src={getRankIcon(p.rank?.tier)} className="w-5 h-5 object-contain" alt="rank-icon" />
                           <span className="text-indigo-300/90 text-[12px] font-bold uppercase tracking-tight">{p.rank?.tier} {p.rank?.rank} - {p.rank?.lp} LP</span>
                         </div>
@@ -338,7 +336,7 @@ function LiveGame({ data }) {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-row-reverse gap-2 items-center">
+                  <div className="flex flex-row-reverse gap-2 items-center pr-12 flex-shrink-0">
                     <div className="flex flex-col gap-1">
                       <img src={`https://ddragon.leagueoflegends.com/cdn/15.23.1/img/spell/${getSpellName(p.spell1Id)}.png`} className="w-7 h-7 rounded border border-slate-800" alt="Spell 1" />
                       <img src={`https://ddragon.leagueoflegends.com/cdn/15.23.1/img/spell/${getSpellName(p.spell2Id)}.png`} className="w-7 h-7 rounded border border-slate-800" alt="Spell 2" />
@@ -400,15 +398,22 @@ function LiveGame({ data }) {
                       <span className="text-[10px] text-yellow-400 font-bold">{match.challenges?.goldPerMinute?.toFixed(1) || "0.0"} G/M</span>
                       <span className="text-[10px] text-indigo-400 font-bold">{match.challenges?.visionScorePerMinute?.toFixed(2) || "0.00"} VS/M</span>
                     </div>
-
                     <div className="flex-1 px-4 flex flex-wrap content-center gap-1 overflow-hidden">
-                      {getPerformanceTags(match).map((tag, idx) => (
-                        <span key={idx} className="px-1.5 py-0.5 rounded bg-slate-950/60 border border-slate-800 text-[8px] font-bold text-blue-400/80 uppercase tracking-tighter whitespace-nowrap">
-                          {tag}
+                      {match.timePlayed > 180 ? (
+                        getPerformanceTags(match).map((tag, idx) => (
+                          <span 
+                            key={idx} 
+                            className="px-1.5 py-0.5 rounded bg-slate-950/60 border border-slate-800 text-[8px] font-bold text-blue-400/80 uppercase tracking-tighter whitespace-nowrap"
+                          >
+                            {tag}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="px-2 py-0.5 rounded bg-rose-950/40 border border-rose-500/50 text-[10px] font-black text-rose-500 uppercase tracking-widest">
+                          REMAKE
                         </span>
-                      ))}
+                      )}
                     </div>
-
                     <div className="flex items-center gap-2 px-4 border-l border-slate-800/50">
                       <div className="grid grid-cols-2 gap-1">
                         <img src={`https://ddragon.leagueoflegends.com/cdn/15.24.1/img/spell/${getSpellName(match.spell1)}.png`} className="w-5 h-5 rounded" title="Spell 1" />
