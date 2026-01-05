@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Home from './components/Home';
 import LiveGame from './components/LiveGame.jsx';
+import IoniaWallpaper from './assets/IoniaWallpaper.jpg';
 
 function App() {
   const [gameData, setGameData] = useState(null);
@@ -36,11 +37,25 @@ function App() {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-slate-950 text-blue-500 flex items-center justify-center font-bold">LOADING MATCH DATA (90+ REQUESTS)...</div>;
-
   return (
     <>
-      {!gameData ? (<Home onSearch={performSearch} error={error} setError={setError}/>) : (<LiveGame data={gameData} />)}
+      <div 
+        className="fixed inset-0 z-[-1] bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: `url(${IoniaWallpaper})`,
+          backgroundAttachment: 'fixed' 
+        }}
+      />
+      <div className="fixed inset-0 z-[-1] bg-slate-950/70" />
+      {loading ? (
+        <div className="min-h-screen text-blue-500 flex items-center justify-center font-bold">
+          LOADING MATCH DATA (90+ REQUESTS)...
+        </div>
+      ) : !gameData ? (
+        <Home onSearch={performSearch} error={error} setError={setError}/>
+      ) : (
+        <LiveGame data={gameData} />
+      )}
     </>
   );
 }

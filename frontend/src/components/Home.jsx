@@ -23,7 +23,7 @@ function Home({ onSearch, error, setError }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center">
+    <div className="min-h-screen text-white flex flex-col justify-center items-center">
       <form onSubmit={handleSubmit} className="w-full max-w-xl px-4 flex shadow-2xl">
         <div className="relative">
           <button 

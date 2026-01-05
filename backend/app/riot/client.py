@@ -7,22 +7,21 @@ class RiotClient:
         # Attach key as request header
         self.headers = {"X-Riot-Token": RIOT_API_KEY}
         self.connection_limit = asyncio.Semaphore(10)
+        self.client = httpx.AsyncClient(headers=self.headers, timeout=30, http2=True)
 
     # Reusable helper to keep code clean
-    async def _request(self, url, params=None, timeout=10):
+    async def _request(self, url, params=None):
         # Semaphore to limit concurrent network connections
         async with self.connection_limit:
-            # Async HTTP client
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                for attempt in range(3):
-                    # Send GET request and package as json 
-                    response = await client.get(url, headers=self.headers, params=params)
-                    if response.status_code == 429:
-                        wait_time = int(response.headers.get("Retry-After", 2))
-                        await asyncio.sleep(wait_time)
-                        continue
-                    response.raise_for_status()
-                    return response.json()
+            for attempt in range(3):
+                # Send GET request and package as json 
+                response = await self.client.get(url, headers=self.headers, params=params)
+                if response.status_code == 429:
+                    wait_time = int(response.headers.get("Retry-After", 2))
+                    await asyncio.sleep(wait_time)
+                    continue
+                response.raise_for_status()
+                return response.json()
 
     async def get_account_by_riot_id(self, name: str, tag: str, routing: str = "americas"):
         # Build Account-V1 endpoint URL by name tag 
@@ -53,6 +52,6 @@ class RiotClient:
     async def get_match(self, match_id: str, routing: str = "americas"):
         # Build Match-V5 endpoint URL by match_id 
         url = f"https://{routing}.api.riotgames.com/lol/match/v5/matches/{match_id}"
-        return await self._request(url, timeout=30)
+        return await self._request(url)
             
             
