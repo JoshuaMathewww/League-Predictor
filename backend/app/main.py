@@ -283,9 +283,11 @@ def sort_participants_by_lane(participants):
 def load_prediction_model():
     global WIN_MODEL, WIN_MODEL_COLS,  WIN_SCALER  
     try:
-        model_path = os.path.join(os.path.dirname(__file__), "gold_model.pkl")
-        cols_path = os.path.join(os.path.dirname(__file__), "gold_model_cols.pkl")
-        scaler_path = os.path.join(os.path.dirname(__file__), "gold_scaler.pkl")
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        
+        model_path = os.path.join(BASE_DIR, "gold_model.pkl")
+        cols_path = os.path.join(BASE_DIR, "gold_model_cols.pkl")
+        scaler_path = os.path.join(BASE_DIR, "gold_scaler.pkl")
         if os.path.exists(model_path) and os.path.exists(cols_path):
             WIN_MODEL = joblib.load(model_path)
             WIN_MODEL_COLS = joblib.load(cols_path)
@@ -326,6 +328,11 @@ load_prediction_model()
 # @app.get("/api/live-game-history", response_model=LiveGameResponse)
 @app.get("/api/live-game-history")
 async def live_game_history(name: str, tag: str, routing: str = "americas", platform: str = "na1", count: int = 7, queue: int = 420):
+    global WIN_MODEL, RANK_BASELINES
+    if WIN_MODEL is None:
+        load_prediction_model()
+    if not RANK_BASELINES:
+        load_rank_baselines()
     account = await riot.get_account_by_riot_id(name=name, tag=tag, routing=routing)
     game = await riot.get_active_game_by_puuid(puuid=account["puuid"], platform=platform)
     
