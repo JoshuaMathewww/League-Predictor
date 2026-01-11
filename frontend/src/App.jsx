@@ -36,7 +36,6 @@ function MainLayout() {
     const selectedRegion = regionMapping[r.toLowerCase()] || regionMapping['na'];
     const response = await fetch(`http://localhost:8000/api/live-game-history?name=${n}&tag=${t}&routing=${selectedRegion.routing}&platform=${selectedRegion.platform}`);
     
-    // Catch cases where the backend is down or unreachable
     if (!response.ok) throw new Error("Could not connect to game server.");
 
     const data = await response.json();
@@ -64,11 +63,11 @@ function MainLayout() {
 
   useEffect(() => {
     const currentPath = `${region}-${name}-${tag}`;
-    // If we have URL params and haven't fetched this player yet
+    // If theres URL params and havent fetched player yet
     if (name && tag && region && currentPath !== lastFetched.current) {
       const initLoad = async () => {
         setLoading(true);
-        setError(null); // Clear errors on fresh reload
+        setError(null); 
         try {
           const data = await fetchRiotData(name, tag, region);
           setGameData(data);
@@ -76,14 +75,13 @@ function MainLayout() {
         } catch (err) {
           setError(err.message);
           setGameData(null);
-          lastFetched.current = currentPath; // Mark as "tried" so we don't loop
+          lastFetched.current = currentPath; 
         } finally {
           setLoading(false);
         }
       };
       initLoad();
     } else if (!name) {
-      // Home page state reset
       setGameData(null);
       setError(null);
       lastFetched.current = "";

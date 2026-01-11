@@ -16,13 +16,21 @@ class RiotClient:
             for attempt in range(3):
                 # Send GET request and package as json 
                 response = await self.client.get(url, headers=self.headers, params=params)
+                # if response.is_error:
+                #     print(f"DEBUG: Riot API Error {response.status_code} at {url}")
                 if response.status_code == 429:
                     wait_time = int(response.headers.get("Retry-After", 2))
                     await asyncio.sleep(wait_time)
                     continue
                 response.raise_for_status()
                 return response.json()
-
+    
+    async def get_league_entries_harvester(self, tier: str, division: str = "I", platform: str = "na1", page: int = 1):
+        queue = "RANKED_SOLO_5x5"
+        url = f"https://{platform}.api.riotgames.com/lol/league/v4/entries/{queue}/{tier}/{division}"
+        params = {"page": page}
+        return await self._request(url, params=params)
+    
     async def get_account_by_riot_id(self, name: str, tag: str, routing: str = "americas"):
         # Build Account-V1 endpoint URL by name tag 
         url = f"https://{routing}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"

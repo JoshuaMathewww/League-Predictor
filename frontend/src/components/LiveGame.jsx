@@ -2,6 +2,17 @@ import { useState, useEffect } from 'react';
 
 // --- DATA HELPERS ---
 
+const AutofillBadge = ({ isAutofilled }) => {
+  if (!isAutofilled) return null;
+  return (
+    <div className="relative group/autofill ml-2">
+      <div className="flex items-center justify-center w-5 h-5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-500 cursor-help transition-colors hover:bg-amber-500/30">
+        <span className="text-[10px] font-black uppercase tracking-tighter">AF</span>
+      </div>
+    </div>
+  );
+};
+
 const getRankIcon = (tier) => {
   const t = tier?.toLowerCase() || 'unranked';
   if (t === 'emerald') {
@@ -51,43 +62,44 @@ const formatTimeAgo = (timestamp) => {
 
 // --- SUB-COMPONENTS ---
 
-const sortParticipantsByLane = (participants) => {
-  const sorted = { TOP: null, JNG: null, MID: null, BOT: null, SUP: null };
-  const remaining = [...participants];
-  
-  const jngIndex = remaining.findIndex(p => p.spell1Id === 11 || p.spell2Id === 11);
-  if (jngIndex !== -1) {
-    sorted.JNG = remaining.splice(jngIndex, 1)[0];
-  }
+const WinProbabilityBar = ({ prediction }) => {
+  // prediction is 0.0 to 1.0 (Blue Team chance)
+  const blueChance = (prediction * 100).toFixed(1);
+  const redChance = (100 - blueChance).toFixed(1);
 
-  const order = ['TOP', 'MID', 'BOT', 'SUP'];
-  order.forEach(lane => {
-    if (remaining.length === 0) return;
-    let bestPlayerIndex = 0;
-    let maxProb = -1;
-
-    remaining.forEach((p, i) => {
-      const prob = p.laneProbabilities?.[lane] || 0;
-      if (prob > maxProb) {
-        maxProb = prob;
-        bestPlayerIndex = i;
-      }
-    });
-
-    if (!sorted[lane]) {
-      sorted[lane] = remaining.splice(bestPlayerIndex, 1)[0];
-    }
-  });
-
-  const finalArray = [sorted.TOP, sorted.JNG, sorted.MID, sorted.BOT, sorted.SUP].filter(Boolean);
-  
-  if (finalArray.length < 5) {
-    return [...finalArray, ...remaining];
-  }
-
-  return finalArray;
+  return (
+    <div className="w-full mb-8">
+      <div className="flex justify-between items-end mb-2 px-1">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Win Chance</span>
+          <span className="text-2xl font-black text-blue-400">{blueChance}%</span>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Win Chance</span>
+          <span className="text-2xl font-black text-red-400">{redChance}%</span>
+        </div>
+      </div>
+      
+      {/* The Probability Line */}
+      <div className="relative w-full h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700 shadow-lg flex">
+        <div 
+          className="h-full bg-gradient-to-r from-blue-600 to-blue-400 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(59,130,246,0.5)]" 
+          style={{ width: `${blueChance}%` }} 
+        />
+        <div 
+          className="h-full bg-gradient-to-l from-red-600 to-red-400 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(239,68,68,0.5)]" 
+          style={{ width: `${redChance}%` }} 
+        />
+        {/* Center Indicator */}
+        <div className="absolute top-0 bottom-0 left-1/2 w-[2px] bg-white/20 z-10" />
+      </div>
+      
+      <p className="text-center text-[10px] text-slate-500 mt-2 uppercase tracking-tighter font-medium">
+        AI prediction based on past performance averages
+      </p>
+    </div>
+  );
 };
-
 
 function GameTimer({ startTime, initialLength }) {
   const [elapsed, setElapsed] = useState(initialLength);
@@ -232,7 +244,7 @@ function LiveGame({ data }) {
             </div>
           </div>
         </header>
-
+        <WinProbabilityBar prediction={data.prediction || 0.5} />
         <div className="flex justify-between items-center mb-8 px-6 py-3 bg-slate-900/40 rounded-xl border border-slate-800/40 shadow-inner w-full">
           <div className="flex gap-2 items-center">
             <span className="text-[10px] font-bold uppercase tracking-widest text-blue-500/60 mr-2">Blue Bans</span>
@@ -248,12 +260,12 @@ function LiveGame({ data }) {
             ))}
           </div>
         </div>
-
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-1 gap-y-4">
           {/* Blue Team Participants */}
           <div className="space-y-2">
             <h3 className="text-blue-400 font-bold border-l-4 border-blue-500 pl-3 mb-4 uppercase text-sm tracking-wider">Blue Team</h3>
-            {sortParticipantsByLane(data.participants.filter(p => p.teamId === 100)).map((p, index) => {
+            {data.participants.filter(p => p.teamId === 100).map((p, index) => {
               const isHidden = !p.puuid;
               return (
                 <div 
@@ -279,11 +291,12 @@ function LiveGame({ data }) {
                           <span className="text-indigo-300/90 text-[12px] font-bold uppercase tracking-tight">{p.rank?.tier} {p.rank?.rank} - {p.rank?.lp} LP</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 mt-1.5 text-[12px] font-bold tracking-tight">
-                        <span className="text-slate-400 text-[13px] font-medium">#{p.tagLine}</span>
+                      <div className="flex items-center mt-1.5 text-[12px] font-bold tracking-tight">
+                        <span className="text-slate-400 text-[13px] font-medium pr-1.5">#{p.tagLine}</span>
                         <span className={`px-1.5 py-0.5 rounded-sm bg-slate-950/40 ${p.rank?.winrate >= 50 ? 'text-emerald-700/90': 'text-rose-700/75'}`}>
                           {p.rank?.winrate}% WR <span className="font-medium">({p.rank?.wins}W {p.rank?.losses}L)</span>
                         </span>
+                        <AutofillBadge isAutofilled={p.autofilled} />
                       </div>
                     </div>
                   </div>
@@ -302,7 +315,7 @@ function LiveGame({ data }) {
           {/* Red Team Participants */}
           <div className="space-y-2">
             <h3 className="text-red-400 font-bold border-r-4 border-red-500 pr-3 mb-4 text-right uppercase text-sm tracking-wider">Red Team</h3>
-            {sortParticipantsByLane(data.participants.filter(p => p.teamId === 200)).map((p, index) => {
+            {data.participants.filter(p => p.teamId === 200).map((p, index) => {
               const isHidden = !p.puuid;
               return (
                 <div 
@@ -328,11 +341,12 @@ function LiveGame({ data }) {
                           <span className="text-indigo-300/90 text-[12px] font-bold uppercase tracking-tight">{p.rank?.tier} {p.rank?.rank} - {p.rank?.lp} LP</span>
                         </div>
                       </div>
-                      <div className="flex flex-row-reverse items-center gap-2 mt-1.5 text-[12px] font-bold tracking-tight">
+                      <div className="flex flex-row-reverse items-center gap-1.5 mt-1.5 text-[12px] font-bold tracking-tight">
                         <span className="text-slate-400 text-[13px] font-medium">#{p.tagLine}</span>
                         <span className={`px-1.5 py-0.5 rounded-sm bg-slate-950/40 ${p.rank?.winrate >= 50 ? 'text-emerald-700/90': 'text-rose-700/75'}`}>
                           {p.rank?.winrate}% WR <span className="font-medium">({p.rank?.wins}W {p.rank?.losses}L)</span>
                         </span>
+                        <AutofillBadge isAutofilled={p.autofilled} />
                       </div>
                     </div>
                   </div>

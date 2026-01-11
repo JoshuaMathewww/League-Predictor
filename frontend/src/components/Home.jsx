@@ -9,7 +9,6 @@ function Home({ onSearch, error, setError }) {
     { name: 'NA', value: 'na1' },
     { name: 'EUW', value: 'euw1' },
     { name: 'KR', value: 'kr' },
-    // ... add others as needed
   ];
 
   const handleSubmit = (e) => {
