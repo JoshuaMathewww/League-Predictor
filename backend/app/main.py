@@ -188,8 +188,9 @@ MODEL_FEATURES = [
 
 def load_rank_baselines():
     global RANK_BASELINES
-    try:
-        df = pd.read_csv("gold_averages.csv")
+    try:    
+        gold_averages_path = os.path.join(os.path.dirname(__file__), "gold_averages.csv")
+        df = pd.read_csv(gold_averages_path)
         RANK_BASELINES = df.groupby("role")[MODEL_FEATURES].mean().to_dict('index')
         print(f"DEBUG: Baselines loaded successfully.")
     except Exception as e:
