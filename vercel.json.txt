@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "backend/app/main.py": {
+      "runtime": "vercel-python@0.0.6"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -9,10 +14,5 @@
       "source": "/(.*)",
       "destination": "frontend/dist/$1"
     }
-  ],
-  "functions": {
-    "backend/app/main.py": {
-      "runtime": "vercel-python@0.0.6"
-    }
-  }
+  ]
 }
