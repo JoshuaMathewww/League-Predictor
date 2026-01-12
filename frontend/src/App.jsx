@@ -34,7 +34,7 @@ function MainLayout() {
       'kr': { routing: 'asia', platform: 'kr' },
     };
     const selectedRegion = regionMapping[r.toLowerCase()] || regionMapping['na'];
-    const response = await fetch(`/api/live-game-history?name=${n}&tag=${t}&routing=${selectedRegion.routing}&platform=${selectedRegion.platform}`);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/live-game-history?name=${n}&tag=${t}&routing=${selectedRegion.routing}&platform=${selectedRegion.platform}`);
     
     if (!response.ok) throw new Error("Could not connect to game server.");
 
