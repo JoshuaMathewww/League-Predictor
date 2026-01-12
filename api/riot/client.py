@@ -1,6 +1,6 @@
 import httpx
 import asyncio
-from app.config import RIOT_API_KEY
+from config import RIOT_API_KEY
 
 class RiotClient:
     def __init__(self):
