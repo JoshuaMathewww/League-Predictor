@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from app.riot.client import RiotClient
+from riot.client import RiotClient
 from fastapi.middleware.cors import CORSMiddleware
-from app.schemas import LiveGameResponse
+from schemas import LiveGameResponse
 import pandas as pd
 import itertools
 import asyncio
