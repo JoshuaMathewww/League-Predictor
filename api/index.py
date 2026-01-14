@@ -27,7 +27,7 @@ WIN_MODEL_COLS = None
 WIN_SCALER = None
 
 
-# Helper to load lane data from local JSON 
+# Helper to load lane data from JSON 
 def load_lanes_data():
     path = os.path.dirname(__file__)
     file_path = os.path.join(path, "lanes.json")
@@ -48,7 +48,7 @@ async def account(name: str, tag: str, routing: str = "americas"):
 
 @app.get("/api/live-game")
 async def live_game(name: str, tag: str, routing: str = "americas", platform: str = "na1"):
-    # Get account info (PUUID)
+    # Get account info PUUID
     account = await riot.get_account_by_riot_id(name=name, tag=tag, routing=routing)
 
     puuid = account["puuid"]
@@ -80,7 +80,7 @@ async def get_player_stats(p_puuid, routing, platform, count, queue):
         league_data = riot.get_league_entries(puuid=p_puuid, platform=platform)
         m_ids, league_data = await asyncio.gather(m_ids_data, league_data)
 
-        # Process Rank Info (Solo/Duo)
+        # Process rank info Solo/Duo
         solo_duo = next((item for item in league_data if item["queueType"] == "RANKED_SOLO_5x5"), None)
         if solo_duo:
             wins = solo_duo["wins"]
@@ -207,7 +207,7 @@ def calculate_player_average(history, target_role, rank_avgs):
     averages = {}
     total_weight = 0
    
-    # Decay weighting: most recent games (start of list) carry more weight
+    # Decay weighting 
     for i, match in enumerate(role_matches):
         weight = 1.0 / (i + 1)  # Simple decay 1, 0.5, 0.33...
         total_weight += weight
@@ -247,7 +247,7 @@ def sort_participants_by_lane(participants):
 
     # Lock jungle remove first smite user from remaining
     jng_idx = next((i for i, p in enumerate(remaining) if p.get("spell1Id") == 11 or p.get("spell2Id") == 11), -1)
-     # If no smite pick best JNG probability
+     # If no smite pick best JNG 
     if jng_idx == -1 and remaining:
         jng_idx = max(range(len(remaining)), key=lambda i: float((remaining[i].get("laneProbabilities") or {}).get("JNG", 0) or 0))
     if jng_idx != -1:
@@ -255,13 +255,12 @@ def sort_participants_by_lane(participants):
 
     roles = ["TOP", "MID", "BOT", "SUP"]
 
-    # the 4 non jungle players (preserve their current order)
+    # the 4 non jungle players 
     players = remaining[:4]
 
     best_order = roles
     best_score = float("-inf")
 
-    # permute roles, not players (matches JS)
     for order in itertools.permutations(roles):
         score = 0.0
         for i in range(len(players)):

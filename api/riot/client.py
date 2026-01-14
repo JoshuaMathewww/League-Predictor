@@ -9,7 +9,6 @@ class RiotClient:
         self.connection_limit = asyncio.Semaphore(10)
         self.client = httpx.AsyncClient(headers=self.headers, timeout=30, http2=True)
 
-    # Reusable helper to keep code clean
     async def _request(self, url, params=None):
         # Semaphore to limit concurrent network connections
         async with self.connection_limit:
